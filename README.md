@@ -4,6 +4,8 @@ Teensy 4 oscilloscope / XY Display
 A small and cheap oscilloscope style XY display based on a Teensy 4.1
 and a 3.2" or 3.5" LCD module
 
+![XY Scope](overview.jpg)
+
 ## Current functionality
 This is a very simple first try-out of an XY oscilloscope.
 It mimics an analog CRT phosphor style display by increasing the intensity
@@ -27,28 +29,9 @@ The following commands are implemented:
 - reset: resets the Teensy and start again
 
 ## Hardware
-A Teensy 4.1 and an LCD module is all that is needed.
-Note that only LCD modules with an ILI9481 or ILI9486 driver are supported.
-These are commonly used on Arduino Mega style TFT LCD modules.
-
-I tested two different modules that have the following marking on the PCB:
-
-- HVGA 480x320 3.5' TFTLCD Shield for Arduino Mega2560 / Driver ILI9486
-  (https://www.tinytronics.nl/shop/en/displays/tft/3.5-inch-tft-display-320*480-pixels-mega-compatible-ili9486)
-- HVGA 480x320 3.2' TFTLCD Shield for Arduino Mega2560 / ILI9481
-  (https://www.tinytronics.nl/shop/en/displays/tft/3.2-inch-tft-display-320*480-pixels-mega-due-compatible-ili9481)
-  
-See the schematics for connecting the LCD to the Teensy 4.1.
-Schematics can be found here: [Hardware](Hardware)
-
-Please note that this will most likely not work with a Teensy 4.1 mounted on
-a breadboard with DuPont style wires connected to the LCD due to the speed
-at which the interface is being driven.
-The Teensy 4.1 and LCD module must be soldered onto a prototype PCB.
-Use pin headers to allow for easy swapping of Teensy and LCD in case of a problem.
-The connections from the LCD to the Teensy are optimized for hand soldering wires
-on a prototyping PCB, keeping as much as possible the unused pins free for future
-enhancements.
+A Teensy 4.1 and an LCD module are all components that are needed.
+For more detailed information and schematics see the
+[Hardware](Hardware) section.
 
 ## Firmware
 The firmware is written in C++ using Arduino and the TeensyDuino extension.
