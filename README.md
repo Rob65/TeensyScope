@@ -17,13 +17,13 @@ in order to play with the parameters for the CRT simulation.
 The following commands are implemented:
 
 - ?: Print help.
-- burn <start> <increment> <max>: Set the intensity levels of a pixel on the
+- burn \<start\> \<increment\> \<max\>: Set the intensity levels of a pixel on the
         LCD. Start determines the initial intensity, increment is the value
         at which the intensity is raised when a next sample is shown at the same
         pixel and max is the maximum value of the pixel.
         The intensity goes from 0 to 255 but the max. value can be higher to
         allow for a slower decay (i.e. the pixel will be visible for a longer time)
-- decay <value>: Determines the amount that is used to decrease the intensity of
+- decay \<value\>: Determines the amount that is used to decrease the intensity of
         a pixel on the LCD. This determines how fast a pixel will fade out.
 - status: shows the current values for burn and decay parameters
 - reset: resets the Teensy and start again
@@ -49,7 +49,7 @@ Processing of one set of x,y samples takes ~ 5 µs and updating the LCD ~ 31.3 m
 This leaves ~ 20% of the available CPU time for future enhancements.
 
 ## ToDo
-- [ ] Add photos of prototype PCB to aid in recreating this
+- [x] Add photos of prototype PCB to aid in recreating this
 - [ ] Add a reticule (the grid on an oscilloscope)
 - [ ] Add a timebase to be able to use this as a standard time based oscilloscope
 - [ ] Add buttons/encoder as a user interface
