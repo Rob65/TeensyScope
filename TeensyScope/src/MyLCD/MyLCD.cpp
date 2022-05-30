@@ -848,7 +848,7 @@ void MyLCD::draw_xy_scope(int x, int y, int sx, int sy, uint16_t *data)
     } else {
         digitalWriteFast(CS_PIN, LOW);
         for (ty=0; ty<sy; ty++) {
-            set_display_area(x, y+ty, x+sx-1, y+ty);
+            set_display_area(x, y+sy-ty-1, x+sx-1, y+sy-ty-1);
             for (tx=sx-1; tx>=0; tx--) {
                 //col=pgm_read_word(&data[(ty*sx)+tx]);
                 col=pgm_read_word(&data[(tx*sy)+ty]);
