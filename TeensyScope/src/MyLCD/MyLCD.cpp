@@ -4,6 +4,8 @@
 
 #include "MyLCD.h"
 
+#define DRAW_RETICLE // Undefine when no reticle should be drawn
+
 /*
  * I/O Pin definitions for the LCD interface
  * The LCD uses a 16 bits 8080 series parallel interface
@@ -853,6 +855,20 @@ void MyLCD::draw_xy_scope(int x, int y, int sx, int sy, uint16_t *data)
                 // (r & 0b11111000) << 8 | (g & 0b11111100) << 3 | (b & 0b11111000) >> 3;
                 if(col > 255) col = 255;
                 col = (col & 0b11111000) << 8 | (col & 0b11111100) << 3;
+                /*
+                 * Check and draw reticle
+                 * only when no data at this point
+                 */
+#ifdef DRAW_RETICLE
+                if(col == 0) {
+                    // Check for reticle to be drawn
+                    if(((tx+1)%(sx/10) == 0) && ((ty+1)%(sy/40) == 0)) col=0xffff;
+                    else if(((tx+1)%(sx/50) == 0) && ((ty+1)%(sy/8) == 0)) col=0xffff;
+                    else if((tx == 0) || (tx == (sx-1)) || (ty == 0) || (ty == (sy-1))) col=0xffff;
+                    else if(((tx >= (sx/2-3))&&(tx <= (sx/2+1))) && ((ty+1)%(sy/40) == 0)) col = 0xffff;
+                    else if(((ty >= (sy/2-3))&&(ty <= (sy/2+1))) && ((tx+1)%(sx/50) == 0)) col = 0xffff;
+                }
+#endif
                 write_word(col);
             }
         }

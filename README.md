@@ -45,12 +45,13 @@ CPU Speed 600 MHz (default).
 Pins 10 and 11 are used as debug pins in order to measure timing 
 during development.
 The current firmware (0.1.0) has a fixed 25 µs sampling interval.
-Processing of one set of x,y samples takes ~ 5 µs and updating the LCD ~ 31.3 ms
+Processing of one set of x,y samples takes ~ 5 µs and updating the LCD ~ 31.3 ms.
 This leaves ~ 20% of the available CPU time for future enhancements.
+After adding the reticle, updating the LCD takes ~ 43 ms, so only ~ 15% CPU time is avaiable.
 
 ## ToDo
 - [x] Add photos of prototype PCB to aid in recreating this
-- [ ] Add a reticule (the grid on an oscilloscope)
+- [x] Add a reticle (the grid on an oscilloscope)
 - [ ] Add a timebase to be able to use this as a standard time based oscilloscope
 - [ ] Add buttons/encoder as a user interface
 - [ ] Add channel settings on the LCD
