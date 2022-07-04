@@ -53,5 +53,7 @@ After adding the reticle, updating the LCD takes ~ 43 ms, so only ~ 15% CPU time
 - [x] Add photos of prototype PCB to aid in recreating this
 - [x] Add a reticle (the grid on an oscilloscope)
 - [ ] Add a timebase to be able to use this as a standard time based oscilloscope
+- [ ] Add a Z input
+- [ ] Add a digital trigger input
 - [ ] Add buttons/encoder as a user interface
 - [ ] Add channel settings on the LCD
