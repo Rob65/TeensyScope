@@ -24,6 +24,8 @@ MyLCD lcd;
 
  */
 #define ADC_OVERSAMPLING  16      // Hardware oversampling, can be set to 0, 4, 8, 16 or 32
+#define SAMPLING_INTERVAL 25      // microseconds
+#define TRIGGER_IN         4      // Trigger signal on pin 4
 
 ADC *adc = new ADC();
 
@@ -33,10 +35,10 @@ IntervalTimer decay_timer;
 uint16_t pixel[WIDTH][HEIGHT];
 uint16_t reticle[WIDTH][HEIGHT]; // for future use
 
-uint16_t decay_val = 7;
+uint16_t decay_val = 3;
 uint16_t burn_start = 160;
 uint16_t burn_inc = 40;
-uint16_t burn_max = 512;
+uint16_t burn_max = 240;
 
 /*
  * CLI command functions
@@ -72,6 +74,91 @@ void cmd_status(int num_params, char *parm[])
     Serial.printf("burn %d %d %d\n\n", burn_start, burn_inc, burn_max);
 }
 
+uint32_t op_time;
+volatile uint8_t  sample_op_state;
+
+/*
+ * Sample TRIGGER_IN to determine the current OP-time setting is.
+ * The interrupt function is called using the IntervalTimer and then walks
+ * trough 4 phases:
+ *    0: wait until the TRIGGER signal is HIGH (to finish the current OP cycle
+ *    1: wait until the TRIGGER signal gets LOW
+ *    2: as long as the TRIGGER is LOW, count the time
+ *    3: finished, signal the 'calling' function that the measurement has completed.
+ *
+ * The cmd_optime function is called when the optime command is given.
+ * This function initializes the measurement, starts the IntervalTimer and then
+ * waits for the measurement to complete (i.e. reach phase 3)
+ * This function will wait  max. 25 s for the measurement to complete so even at the
+ * longest OP-time setting of approx. 10s, it will always detect the current OP cycle to
+ * finish and a next one to complete.
+ *
+ * Note that sample_optime() is called in interrupt context so no higher level functions
+ * should be called here.
+ */
+void sample_optime()
+{
+    switch(sample_op_state) {
+        case 0: // wait for TRIGGER to get high
+                if(digitalReadFast(TRIGGER_IN) == HIGH) {
+                    sample_op_state = 1;
+                }
+                break;
+        case 1: // wait for falling edge on TRIGGER_IN
+                if(digitalReadFast(TRIGGER_IN) == LOW) {
+                    op_time = 1;
+                    sample_op_state = 2;
+                }
+                break;
+        case 2: // measure TRIGGER_IN period
+                if(digitalReadFast(TRIGGER_IN) == LOW) {
+                    op_time++;
+                } else {
+                    sample_op_state = 3;
+                }
+                break;
+        case 3: // Done
+                break;
+    }
+}
+
+void cmd_optime(int num_params, char *param[])
+{
+    unsigned long time;
+
+    // Stop sampling the ADC and initialize measurement
+
+    sampling_timer.end(); // Stop sampling the analog signals
+    Serial.println("Starting OP-time measurement");
+
+    sample_op_state = 0;
+    time = millis();
+    sampling_timer.begin(sample_optime, SAMPLING_INTERVAL);
+
+    // Wait for the measurement to complete or for a timeout
+    while(millis() < (time + 25000)) {
+        if(sample_op_state == 3) {
+            break;
+        }
+    }
+
+    // Stop the measurement and display the result
+
+    sampling_timer.end();
+
+    if(sample_op_state == 3) {
+        Serial.printf("OP-time = %1.2f ms\n", op_time * SAMPLING_INTERVAL / 1000.0);
+    } else if(sample_op_state < 2){
+        Serial.println("No falling edge on TRIGGER found");
+    } else {
+        Serial.println("TRIGGER stays low");
+    }
+
+    // Restart regular sampling function
+    adc->startSynchronizedSingleRead(0, 1); // start ADC, read A0 and A1 channels
+    sampling_timer.begin(sample, 25); // Start sampling at 25 us interval
+}
+
 void cmd_reset(int num_params, char *param[])
 {
     Serial.println("Resetting system");
@@ -86,6 +173,7 @@ void cmd_help(int num_params, char *param[])
     Serial.println("decay <val>              - Set the decay value at which the 'phosphor' will fade out");
     Serial.println("burn <start> <inc> <max> - Set the values for the burn-in of the 'phosphor'");
     Serial.println("status                   - Print the current burn and decay values");
+    Serial.println("optime                   - Measure the current OP-time in msec");
     Serial.println("reset                    - Reset the Teensy, start over");
 }
 
@@ -93,6 +181,7 @@ cli_command_t cli_commands[] = {
     {"decay", cmd_decay},
     {"burn", cmd_burn},
     {"status", cmd_status},
+    {"optime", cmd_optime},
     {"reset", cmd_reset},
     {"?", cmd_help},
     {"\0", NULL}
@@ -207,7 +296,8 @@ void display(void)
 void setup()
 {
     Serial.begin(115200);
-  
+
+    pinMode(TRIGGER_IN, INPUT); // Direct input from ModeOP on Hybrid connector (pin 14)
     pinMode(14, INPUT); // A0 and A1 are the analog inputs for the X and Y channels
     pinMode(15, INPUT);
 
@@ -235,7 +325,7 @@ void setup()
     lcd.fillRect(1, 1, WIDTH-1, HEIGHT-1);
 
     adc->startSynchronizedSingleRead(0, 1); // start ADC, read A0 and A1 channels
-    sampling_timer.begin(sample, 25); // Start sampling at 25 us interval
+    sampling_timer.begin(sample, SAMPLING_INTERVAL); // Start sampling at 25 us interval
 }
 
 void loop()

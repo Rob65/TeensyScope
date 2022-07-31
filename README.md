@@ -25,6 +25,7 @@ The following commands are implemented:
         allow for a slower decay (i.e. the pixel will be visible for a longer time)
 - decay \<value\>: Determines the amount that is used to decrease the intensity of
         a pixel on the LCD. This determines how fast a pixel will fade out.
+- optime: Measures the OP-time from THAT (i.e. the low period on the trigger input)
 - status: shows the current values for burn and decay parameters
 - reset: resets the Teensy and start again
 
