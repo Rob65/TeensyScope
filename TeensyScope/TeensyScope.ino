@@ -33,7 +33,6 @@ IntervalTimer sampling_timer;
 IntervalTimer decay_timer;
 
 uint16_t pixel[WIDTH][HEIGHT];
-uint16_t reticle[WIDTH][HEIGHT]; // for future use
 
 uint16_t decay_val = 3;
 uint16_t burn_start = 160;
