@@ -85,7 +85,7 @@ class MyLCD
       	uint8_t	getFontXsize();
       	uint8_t	getFontYsize();
       	void	draw_xy_scope(int x, int y, int sx, int sy, uint16_t *data);
-      	
+        void	draw_scope(int x, int y, int sx, int sy, uint16_t *data);
       	void	lcdOff();
       	void	lcdOn();
       	void	setContrast(char c);

@@ -828,7 +828,7 @@ uint8_t MyLCD::getFontYsize()
 }
 
 /*
- * drawScope is a modified version of drawBitmap.
+ * draw_xy_scope is a modified version of drawBitmap.
  * Instead of drawing a standard 16 bits bitmap, this interprets the XY matrix with intensities
  * for the XY display
  */
@@ -855,6 +855,52 @@ void MyLCD::draw_xy_scope(int x, int y, int sx, int sy, uint16_t *data)
                 // (r & 0b11111000) << 8 | (g & 0b11111100) << 3 | (b & 0b11111000) >> 3;
                 if(col > 255) col = 255;
                 col = (col & 0b11111000) << 8 | (col & 0b11111100) << 3;
+                /*
+                 * Check and draw reticle
+                 * only when no data at this point
+                 */
+#ifdef DRAW_RETICLE
+                if(col == 0) {
+                    // Check for reticle to be drawn
+                    if(((tx+1)%(sx/10) == 0) && ((ty+1)%(sy/40) == 0)) col=0xffff;
+                    else if(((tx+1)%(sx/50) == 0) && ((ty+1)%(sy/8) == 0)) col=0xffff;
+                    else if((tx == 0) || (tx == (sx-1)) || (ty == 0) || (ty == (sy-1))) col=0xffff;
+                    else if(((tx >= (sx/2-3))&&(tx <= (sx/2+1))) && ((ty+1)%(sy/40) == 0)) col = 0xffff;
+                    else if(((ty >= (sy/2-3))&&(ty <= (sy/2+1))) && ((tx+1)%(sx/50) == 0)) col = 0xffff;
+                }
+#endif
+                write_word(col);
+            }
+        }
+        digitalWriteFast(CS_PIN, HIGH);
+    }
+}
+
+/*
+ * draw_xy_scope is a modified version of drawBitmap.
+ * Instead of drawing a standard 16 bits bitmap, this interprets the XY matrix with intensities
+ * for the XY display
+ */
+void MyLCD::draw_scope(int x, int y, int sx, int sy, uint16_t *data)
+{
+    uint16_t col;
+    int tx, ty, tc;
+
+    if (orient==PORTRAIT) {
+        digitalWriteFast(CS_PIN, LOW);
+        set_display_area(x, y, x+sx-1, y+sy-1);
+        for (tc=0; tc<(sx*sy); tc++) {
+            col=pgm_read_word(&data[tc]);
+            write_word(col);
+        }
+        digitalWriteFast(CS_PIN, HIGH);
+    } else {
+        digitalWriteFast(CS_PIN, LOW);
+        for (ty=0; ty<sy; ty++) {
+            set_display_area(x, y+sy-ty-1, x+sx-1, y+sy-ty-1);
+            for (tx=sx-1; tx>=0; tx--) {
+                //col=pgm_read_word(&data[(ty*sx)+tx]);
+                col=pgm_read_word(&data[(tx*sy)+ty]);
                 /*
                  * Check and draw reticle
                  * only when no data at this point

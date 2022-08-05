@@ -7,10 +7,17 @@ and a 3.2" or 3.5" LCD module
 ![XY Scope](overview.jpg)
 
 ## Current functionality
-This is a very simple first try-out of an XY oscilloscope.
-It mimics an analog CRT phosphor style display by increasing the intensity
-depending on the speed of the 'beam' and it also fades out the tail of the
-signal in a similar way as an analog scope does.
+This is the basic TeensyScope for use with The Analog Thing (https://the-analog-thing.org/)
+It contains an XY display function that mimics an analog CRT phosphor style display
+by increasing the intensity depending on the speed of the 'beam' and
+it also fades out the tail of the signal in a similar way as an analog scope does.
+There is also a simple time based display but still with limited functionality:
+- Triggering is fixed on the (digital) ModeOP signal from THAT
+- Only 2 channels (X and Y) are supported
+- The sample rate is fixed at 25 µs
+- The time base can be set at full ms/div values only with 1 ms/s as fastest rate
+- The display only updates when a full screen is collected so at slow OP-TIME settings
+  it can take a long time before the display shows the result of the operation.
 
 A very simple command line interface using the USB-Serial is implemented
 in order to play with the parameters for the CRT simulation.
@@ -50,11 +57,16 @@ Processing of one set of x,y samples takes ~ 5 µs and updating the LCD ~ 31.3 m
 This leaves ~ 20% of the available CPU time for future enhancements.
 After adding the reticle, updating the LCD takes ~ 43 ms, so only ~ 15% CPU time is avaiable.
 
-## ToDo
+## ToDo / Feature requests
 - [x] Add photos of prototype PCB to aid in recreating this
 - [x] Add a reticle (the grid on an oscilloscope)
-- [ ] Add a timebase to be able to use this as a standard time based oscilloscope
+- [x] Add a timebase to be able to use this as a standard time based oscilloscope
 - [ ] Add a Z input
-- [ ] Add a digital trigger input
+- [x] Add a digital trigger input
 - [ ] Add buttons/encoder as a user interface
 - [ ] Add channel settings on the LCD
+- [ ] Add more channels
+- [ ] Add an FFT plot
+- [ ] Automatically adjust the time base depending on the operation period (OP-TIME)
+- [ ] Have the XY display behave as a XY recorder, using the ModeOP signal to start/stop
+      displaying pixels
