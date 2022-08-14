@@ -8,9 +8,15 @@
 
 MyLCD lcd;
 
-#define WIDTH 400
-#define HEIGHT 320
+/*
+ * PIN definitions
+ */
+#define ENABLE_HYBRID_PIN  2
+#define MODE_IC_PIN        3
+#define MODE_OP_PIN        4
 
+#define WIDTH 400   // Setting for the oscilloscope display
+#define HEIGHT 320
 #define XDIV 10
 #define YDIV 8
 #define SUBDIV 5
@@ -21,11 +27,11 @@ MyLCD lcd;
  * Use hardware oversampling of the ADC.
  * This means that after starting an ADC conversion, the ADC will take
  * the given number of samples and report the average of this as the final result.
-
  */
 #define ADC_OVERSAMPLING  16      // Hardware oversampling, can be set to 0, 4, 8, 16 or 32
 #define SAMPLING_INTERVAL 25      // microseconds
-#define TRIGGER_IN         4      // Trigger signal on pin 4
+
+#define TRIGGER_IN         MODE_OP_PIN
 
 /*
  * Trigger state modes
@@ -443,7 +449,10 @@ void setup()
 {
     Serial.begin(115200);
 
-    pinMode(TRIGGER_IN, INPUT); // Direct input from ModeOP on Hybrid connector (pin 14)
+    pinMode(ENABLE_HYBRID_PIN, OUTPUT);
+    digitalWrite(ENABLE_HYBRID_PIN, HIGH); // Hybrid mode is OFF
+    pinMode(MODE_IC_PIN, INPUT);
+    pinMode(MODE_OP_PIN, INPUT); // Direct input from ModeOP on Hybrid connector (pin 14)
     pinMode(14, INPUT); // A0 and A1 are the analog inputs for the X and Y channels
     pinMode(15, INPUT);
 
